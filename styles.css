@@ -1,0 +1,778 @@
+/* =========================================================
+   Diario de Estudio — hoja de estilos
+   Dirección: "la llama manda".
+   La tarjeta de racha es la superficie fuerte de la página y el
+   mapa de calor se colorea con la misma gama naranja; todo lo
+   demás son filetes y tinta. La estructura (filetes, separación)
+   informa; la decoración sobra.
+   ========================================================= */
+
+/* ===== Tokens =====
+   Dos temas, la misma identidad: lo único que cambia es el
+   papel que rodea a la llama; la llama no cambia de color.
+   (El bloque oscuro va DESPUÉS de :root a propósito: tienen
+   la misma especificidad y gana el que esté más abajo.) */
+:root {
+  color-scheme: light; /* date-picker, barras de scroll: todo en claro */
+
+  /* Papel y tinta */
+  --fondo: #f4f4f5;
+  --tarjeta: #ffffff;
+  --texto: #1c1917;
+  --texto-suave: #6b6b72;
+  --borde: #e7e5e4;
+  --borde-fuerte: #87827d; /* 3,80:1 sobre blanco y 3,46:1 sobre el papel (WCAG 1.4.11) */
+
+  /* El único color fuerte: la llama */
+  --fuego: #c2410c;
+  --fuego-hondo: #9a3412;
+  --fuego-suave: #ffedd5;
+  --marfil: #fff7ed;
+
+  /* Acción principal: tinta, para no competir con la llama */
+  --tinta: #1c1917;
+  --tinta-suave: #44403c;
+  --tinta-texto: #ffffff;
+
+  /* Escala de radios: grande para contenedores, pequeña para controles */
+  --radio: 14px;
+  --radio-suave: 10px;
+}
+
+/* ===== Tema oscuro =====
+   Carbón cálido con superficies escalonadas (no negro puro):
+   papel, tarjeta y tinta suben de paso para que todo siga
+   legible. --fuego y --marfil no se tocan: la tarjeta 🔥 se
+   ve igual en los dos temas. */
+[data-tema="oscuro"] {
+  color-scheme: dark;
+
+  /* Papel y tinta */
+  --fondo: #14120f;
+  --tarjeta: #221d1a;
+  --texto: #f2ece4;
+  --texto-suave: #a39d97;
+  --borde: #38312c;
+  --borde-fuerte: #78716c; /* 3,46:1 sobre la tarjeta: borde de input */
+
+  /* La llama en oscuro: naranja claro para pastilla y foco */
+  --fuego-hondo: #fdba74;
+  --fuego-suave: #3a2416;
+
+  /* Acción principal: se invierte (marfil sobre carbón) */
+  --tinta: #f2ece4;
+  --tinta-suave: #d9d2c9;
+  --tinta-texto: #14120f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Foco visible para teclado en todo el documento */
+:focus-visible {
+  outline: 2px solid var(--fuego-hondo);
+  outline-offset: 2px;
+}
+
+/* Todo el ancho de la ventana (RF-2), con el mismo margen lateral
+   que la cabecera: ya no hay columna central de 640px. */
+.contenedor {
+  padding: 24px clamp(16px, 3vw, 40px) 48px;
+}
+
+/* ===== Cabecera =====
+   Barra a todo el ancho, fuera del contenedor (RF-1): el filete
+   inferior llega de borde a borde. El margen lateral es el mismo
+   que el del contenido y el espacio superior lo pone el padding
+   del .contenedor. */
+.cabecera {
+  padding: 20px clamp(16px, 3vw, 40px);
+  border-bottom: 1px solid var(--borde);
+}
+
+.cabecera h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 6vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.cabecera__subtitulo {
+  margin: 6px 0 0;
+  color: var(--texto-suave);
+  font-size: 1rem;
+  max-width: 46ch;
+}
+
+.cabecera__fila {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cabecera__textos {
+  min-width: 0;
+}
+
+/* Botón de tema: 44px como el resto de controles y sin competir
+   con la llama (papel con filete, no tinta). */
+.cabecera__tema {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: var(--tarjeta);
+  color: inherit;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 50%;
+}
+
+.cabecera__icono {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+/* button:hover tiene más especificidad que .cabecera__tema,
+   así que este botón declara su propio hover: solo refuerza el filete. */
+.cabecera__tema:hover {
+  background: var(--tarjeta);
+  border-color: var(--texto-suave);
+}
+
+/* En tema claro se ve la luna; en oscuro, el sol. */
+.cabecera__icono--sol {
+  display: none;
+}
+
+[data-tema="oscuro"] .cabecera__icono--luna {
+  display: none;
+}
+
+[data-tema="oscuro"] .cabecera__icono--sol {
+  display: inline;
+}
+
+/* ===== Tarjetas =====
+   Sin sombra: las tarjetas se separan con filete, no con efecto. */
+.tarjeta {
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.tarjeta h2 {
+  margin: 0 0 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ===== Tarjetero =====
+   Fila de tarjetas encabeza el contenido (RF-3):4 en fila cuando
+   hay sitio y 2×2 o 1 columna cuando no (auto-fit). */
+.tarjetero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* El margen de .tarjeta sobra dentro de los grids nuevos. */
+.tarjetero .tarjeta,
+.rejilla > .tarjeta {
+  margin-bottom: 0;
+}
+
+/* Las tres secciones en columnas (RF-2). */
+.rejilla {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 1024px) {
+  .rejilla {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1.3fr);
+  }
+}
+
+/* Dato del tarjetero: la misma figura que la racha —emoji y cifra
+   grandes arriba, etiqueta pequeña debajo— pero sobre papel de tarjeta
+   y con la cifra más pequeña para no quitarle hierro a la 🔥 (CA3.1).
+   El emoji va dentro de .dato__cifra: hereda su tamaño. */
+.dato {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.dato__cifra {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.9rem, 5vw, 2.5rem); /* 30–40 px: siempre < que la 🔥 */
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.dato__unidad {
+  font-size: 0.5em;
+  letter-spacing: 0;
+}
+
+.dato__texto {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--texto-suave);
+}
+
+/* ===== Racha: la superficie fuerte del tarjetero =====
+   Va después de .tarjeta a propósito: su background manda sobre
+   el de la tarjeta (misma especificidad, gana la regla más
+   reciente). No cambia con el tema: --fuego y --marfil son
+   iguales en claro y en oscuro. */
+.racha {
+  text-align: center;
+  padding: 26px 20px 22px;
+  background: var(--fuego);
+  /* Sin filete visible: su color ya la separa del papel. */
+  border-color: transparent;
+  color: var(--marfil);
+}
+
+.racha__numero {
+  margin: 0;
+  font-size: clamp(3.25rem, 16vw, 4.75rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--marfil);
+}
+
+.racha__texto {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  color: var(--marfil);
+}
+
+/* ===== Formulario ===== */
+.campo {
+  margin-bottom: 14px;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.campo input {
+  width: 100%;
+  min-height: 44px; /* Target táctil cómodo en móvil */
+  padding: 11px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--texto);
+  background: var(--tarjeta);
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-suave);
+  transition: border-color 0.15s ease;
+}
+
+.campo input:hover {
+  /* En claro se oscurece y en oscuro se aclara: el mismo token sirve para los dos. */
+  border-color: var(--texto-suave);
+}
+
+.campo input:focus {
+  outline: 2px solid var(--fuego-hondo);
+  outline-offset: 1px;
+  border-color: var(--fuego-hondo);
+}
+
+/* Aviso de edición inválida (CA1.2): el mismo par de tokens que la píldora
+   de minutos, ya contrastado en ambos temas (6,4:1 en claro y 8,5:1 en oscuro). */
+.formulario__aviso {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  background: var(--fuego-suave);
+  color: var(--fuego-hondo);
+  border-radius: var(--radio-suave);
+  font-size: 0.9rem;
+}
+
+/* La acción principal va en tinta: el color lo lleva la llama.
+   --tinta-texto se invierte en oscuro (marfil sobre carbón). */
+button {
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--tinta-texto);
+  background: var(--tinta);
+  border: none;
+  border-radius: var(--radio-suave);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+button:hover {
+  background: var(--tinta-suave);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--fuego-hondo);
+  outline-offset: 2px;
+}
+
+/* ===== Lista de sesiones ===== */
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lista__vacia {
+  margin: 0;
+  padding: 20px 16px;
+  text-align: center;
+  color: var(--texto-suave);
+  border: 1px dashed var(--borde-fuerte);
+  border-radius: var(--radio-suave);
+  font-size: 0.95rem;
+}
+
+/* "Cargar más sesiones" (RF-6): secondary action — paper with a
+   rule, no flame — and full width on every screen. The class beats
+   the global `button` skin (and its ≥600px `width: auto`) without
+   any !important. */
+.lista__mas {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--texto);
+  background: transparent;
+  border: 1px solid var(--borde-fuerte);
+}
+
+.lista__mas:hover {
+  background: var(--borde);
+}
+
+.sesion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--borde);
+  flex-wrap: wrap; /* Las acciones pasan a su propia línea (RF-1) */
+}
+
+.sesion:first-child {
+  padding-top: 0;
+}
+
+.sesion:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sesion__tema {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.sesion__fecha {
+  margin: 3px 0 0;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sesion__minutos {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  background: var(--fuego-suave);
+  color: var(--fuego-hondo); /* 6,4:1 en claro y 8,5:1 en oscuro */
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Editar y borrar: en su propia línea, alineados a la derecha, para que a
+   375 px no le quiten sitio al tema ni a los minutos. */
+.sesion__acciones {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Botón fantasma: no compite con "Guardar sesión", que es la acción principal.
+   --texto ya es el color del cuerpo (≥4,5:1) y --borde-fuerte es el filete de
+   los inputs (≥3:1): contraste cubierto en los dos temas. */
+.sesion__accion {
+  width: auto;
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--texto);
+  border: 1px solid var(--borde-fuerte);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.sesion__accion:hover {
+  background: var(--borde);
+}
+
+/* ===== Movimiento ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  button:active {
+    transform: none;
+  }
+}
+
+/* ===== Pantallas grandes ===== */
+@media (min-width: 600px) {
+  .contenedor {
+    padding-top: 40px;
+  }
+
+  .tarjeta {
+    padding: 24px;
+  }
+
+  .racha {
+    padding: 32px 24px 26px;
+  }
+
+  /* En el tarjetero la tarjeta es estrecha: el número baja de
+     76px a 44–56px para no dominar la fila. */
+  .racha__numero {
+    font-size: clamp(2.75rem, 6vw, 3.5rem);
+  }
+
+  button {
+    width: auto;
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+}
+
+/* ===== Heat map =====
+   12 weeks x 7 days as rows: a header row of weekday letters, then
+   one row per week starting with its Monday date. The level colours
+   live in one variable per theme and cells and legend swatches read
+   the same ones, so they always match (same colours). */
+:root {
+  --mapa-filete: var(--borde-fuerte);
+  /* Orange ramp on the light card (RF-5): every level meets 3:1
+     against --tarjeta and keeps 1.5:1 against its neighbours. */
+  --mapa-nivel-1: #ea580c;
+  --mapa-nivel-2: #b4400d;
+  --mapa-nivel-3: #7c2d12;
+  --mapa-nivel-4: #4a190b;
+}
+
+[data-tema="oscuro"] {
+  /* Same ramp flipped light on the dark card (RF-5): 3:1+ each. */
+  --mapa-nivel-1: #c2410c;
+  --mapa-nivel-2: #f97316;
+  --mapa-nivel-3: #fdba74;
+  --mapa-nivel-4: #fff7ed;
+}
+
+.mapa__rejilla {
+  display: grid;
+  grid-template-columns: auto repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+
+/* Header row: the corner over the date column plus the weekday
+   letters. The date label of each week row shares the auto column.
+   All three are aria-hidden in JS (decorative reading aids). */
+.mapa__esquina {
+  /* placeholder: keeps the first column for the week labels */
+}
+
+.mapa__dia {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--texto-suave);
+}
+
+.mapa__etiqueta {
+  align-self: center;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  color: var(--texto-suave);
+}
+
+/* Each level declares its colour once; the cell and its legend
+   swatch share the declaration. */
+.mapa__celda--nivel-0,
+.mapa__muestra--nivel-0 {
+  --nivel-color: var(--tarjeta);
+}
+
+.mapa__celda--nivel-1,
+.mapa__muestra--nivel-1 {
+  --nivel-color: var(--mapa-nivel-1);
+}
+
+.mapa__celda--nivel-2,
+.mapa__muestra--nivel-2 {
+  --nivel-color: var(--mapa-nivel-2);
+}
+
+.mapa__celda--nivel-3,
+.mapa__muestra--nivel-3 {
+  --nivel-color: var(--mapa-nivel-3);
+}
+
+.mapa__celda--nivel-4,
+.mapa__muestra--nivel-4 {
+  --nivel-color: var(--mapa-nivel-4);
+}
+
+/* The generic button skin (ink fill, 44px, big radius) does not
+   fit here: the grid decides the size — 32px-tall ribbons, wider
+   than tall. The global :focus-visible (flame) stays — that is the
+   keyboard focus CA5.1 asks for. */
+.mapa__celda {
+  width: auto;
+  min-height: 32px;
+  padding: 0;
+  background: var(--nivel-color);
+  border: 1px solid var(--mapa-filete);
+  border-radius: 3px;
+}
+
+/* button:hover has more specificity than the level class, so the
+   cell declares its own hover to keep its colour. */
+.mapa__celda:hover {
+  background: var(--nivel-color);
+}
+
+.mapa__detalle {
+  min-height: 1.55em;
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+  color: var(--texto);
+}
+
+.mapa__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.mapa__leyenda li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mapa__muestra {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  background: var(--nivel-color);
+  border: 1px solid var(--mapa-filete);
+  border-radius: 3px;
+}
+
+/* 375 px: less horizontal padding in the card so the grid fits
+   without a horizontal scroll and cells stay 24 px (RNF-6). */
+@media (max-width: 599px) {
+  .mapa {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+
+/* ===== Objetivo mensual (Spec 004) =====
+   Banda de papel con filete, igual que las tarjetas: es un
+   contenedor más, no decoración. Solo se ve mientras el mes no
+   tiene meta o mientras se está editando la meta. */
+.objetivo {
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.objetivo form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+
+.objetivo__titulo {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Etiqueta + input + unidad viajan juntos y crecen en la fila.
+   Reutilizan la piel de .campo (foco, hover y 44px ya medidos). */
+.objetivo .campo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 240px;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.objetivo .campo label {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.objetivo .campo input {
+  flex: 1 1 90px;
+  width: auto;
+  min-width: 0;
+}
+
+.objetivo__unidad {
+  color: var(--texto-suave);
+  font-size: 0.95rem;
+}
+
+/* El aviso reutiliza la piel del aviso de sesión (pares ya medidos:
+   6,4:1 en claro y 8,5:1 en oscuro) y solo cambia su margen. */
+.objetivo__aviso {
+  margin: 12px 0 0;
+}
+
+/* Tarjeta del objetivo: como las demás tarjetas de dato más su
+   acción secundaria "Cambiar" (mismo filete que .lista__mas). */
+.objetivo-tarjeta[hidden] {
+  display: none; /* .dato declara display:flex y ganaría al atributo hidden */
+}
+
+.objetivo__cambiar {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--texto);
+  background: transparent;
+  border: 1px solid var(--borde-fuerte);
+}
+
+.objetivo__cambiar:hover {
+  background: var(--borde);
+}
+
+/* ===== Felicitación (Spec 004) =====
+   Overlay fijo con el diálogo en el centro: el único momento en que
+   la llama toma una superficie grande además de la tarjeta de racha
+   (la recompensa). Los textos van en marfil sobre --fuego, el mismo
+   par contrastado de la tarjeta 🔥. */
+.felicitacion {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 18, 15, 0.55);
+}
+
+.felicitacion[hidden] {
+  display: none;
+}
+
+.felicitacion__caja {
+  width: min(100%, 360px);
+  padding: 28px 24px 24px;
+  text-align: center;
+  background: var(--fuego);
+  color: var(--marfil);
+  border-radius: var(--radio);
+}
+
+.felicitacion__emoji {
+  margin: 0 0 6px;
+  font-size: clamp(2.5rem, 10vw, 3.25rem);
+  line-height: 1;
+}
+
+.felicitacion__caja h2 {
+  margin: 0 0 8px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.felicitacion__caja p {
+  margin: 0 0 20px;
+}
+
+/* Botón crema con el par de la llama (6,4:1 claro / 8,5:1 oscuro);
+   al pasar el ratón se invierte el par (mismos ratios). */
+.felicitacion__caja button {
+  background: var(--fuego-suave);
+  color: var(--fuego-hondo);
+}
+
+.felicitacion__caja button:hover {
+  background: var(--fuego-hondo);
+  color: var(--fuego-suave);
+}

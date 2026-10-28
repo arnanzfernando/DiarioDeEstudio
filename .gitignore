@@ -1,0 +1,17 @@
+# Archivos de configuración de IDEs
+.idea/
+.vscode/
+*.iml
+
+# Configuración de OpenCode (no es parte del proyecto web)
+.opencode/
+opencode.json
+.agents/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Repositorio vacío (carpeta residual)
+DiarioDeEstudio/

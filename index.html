@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diario de Estudio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="cabecera">
+    <div class="cabecera__fila">
+      <div class="cabecera__textos">
+        <h1>Diario de Estudio</h1>
+        <p class="cabecera__subtitulo">Registra tus sesiones y mantén la racha viva</p>
+      </div>
+      <button type="button" id="botonTema" class="cabecera__tema" aria-label="Cambiar a tema oscuro">
+        <span class="cabecera__icono cabecera__icono--luna" aria-hidden="true">🌙</span>
+        <span class="cabecera__icono cabecera__icono--sol" aria-hidden="true">☀️</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="contenedor">
+
+    <!-- Monthly goal (Spec 004): only visible while the month has no goal
+         or while the goal is being edited. -->
+    <section class="objetivo" id="seccionObjetivo" aria-labelledby="objetivoTitulo" hidden>
+      <!-- novalidate: validateGoal() es el único validador y muestra
+           el aviso en español (RF-1); la validación nativa lo bloquearía. -->
+      <form id="formularioObjetivo" novalidate>
+        <h2 class="objetivo__titulo" id="objetivoTitulo">🎯 Objetivo de <span id="objetivoMesTexto">este mes</span></h2>
+        <div class="campo objetivo__campo">
+          <label for="objetivoMinutos">Quiero estudiar</label>
+          <input type="number" id="objetivoMinutos" name="objetivoMinutos" min="1" step="1" placeholder="Ej.: 1000" required>
+          <span class="objetivo__unidad">min</span>
+        </div>
+        <button type="submit" id="botonObjetivo">Guardar objetivo</button>
+      </form>
+      <p class="formulario__aviso objetivo__aviso" id="avisoObjetivo" role="alert" hidden></p>
+    </section>
+
+    <!-- Tarjetero -->
+    <div class="tarjetero" aria-live="polite">
+
+      <!-- Racha actual -->
+      <section class="tarjeta racha">
+        <p class="racha__numero"><span aria-hidden="true">🔥</span> <span id="rachaNumero">0</span></p>
+        <p class="racha__texto">días seguidos estudiando</p>
+      </section>
+
+      <section class="tarjeta dato">
+        <p class="dato__cifra"><span aria-hidden="true">🏆</span> <span id="mejorRacha">0</span></p>
+        <p class="dato__texto">Mejor racha</p>
+      </section>
+
+      <section class="tarjeta dato">
+        <p class="dato__cifra"><span aria-hidden="true">⏱️</span> <span id="minutosMes">0</span><span class="dato__unidad"> min</span></p>
+        <p class="dato__texto">Este mes</p>
+      </section>
+
+      <section class="tarjeta dato">
+        <p class="dato__cifra"><span aria-hidden="true">📅</span> <span id="diasMes">0</span></p>
+        <p class="dato__texto">Días este mes</p>
+      </section>
+
+      <!-- Goal card (Spec 004): appears only while the month has a goal. -->
+      <section class="tarjeta dato objetivo-tarjeta" id="tarjetaObjetivo" hidden>
+        <p class="dato__cifra"><span aria-hidden="true">🎯</span> <span id="metaMinutos">0</span><span class="dato__unidad"> min</span></p>
+        <p class="dato__texto">Objetivo</p>
+        <button type="button" class="objetivo__cambiar" id="botonCambiarObjetivo">Cambiar</button>
+      </section>
+    </div>
+
+    <div class="rejilla">
+
+      <!-- Heat map -->
+      <section class="tarjeta mapa" aria-labelledby="mapaTitulo">
+        <h2 id="mapaTitulo">Mapa de calor</h2>
+        <div class="mapa__rejilla" id="mapaRejilla"><!-- 12 weeks x 7 days: letters, week labels and 84 buttons — JS paints them --></div>
+        <p class="mapa__detalle" id="mapaDetalle" aria-hidden="true"></p>
+        <ul class="mapa__leyenda">
+          <li><span class="mapa__muestra mapa__muestra--nivel-0"></span> Sin sesiones</li>
+          <li><span class="mapa__muestra mapa__muestra--nivel-1"></span> 1–30 min</li>
+          <li><span class="mapa__muestra mapa__muestra--nivel-2"></span> 31–60 min</li>
+          <li><span class="mapa__muestra mapa__muestra--nivel-3"></span> 61–120 min</li>
+          <li><span class="mapa__muestra mapa__muestra--nivel-4"></span> Más de 120 min</li>
+        </ul>
+      </section>
+
+      <!-- Formulario -->
+      <section class="tarjeta">
+        <h2 id="tituloFormulario">Nueva sesión</h2>
+        <form id="formularioSesion">
+          <div class="campo">
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha" name="fecha" required>
+          </div>
+
+          <div class="campo">
+            <label for="tema">Tema</label>
+            <input type="text" id="tema" name="tema" placeholder="Ej.: Álgebra, Historia de Roma..." required>
+          </div>
+
+          <div class="campo">
+            <label for="minutos">Minutos</label>
+            <input type="number" id="minutos" name="minutos" min="1" step="1" placeholder="Ej.: 30" required>
+          </div>
+
+          <p class="formulario__aviso" id="avisoEdicion" role="alert" hidden></p>
+
+          <button type="submit" id="botonGuardar">Guardar sesión</button>
+          <button type="button" id="botonCancelar" hidden>Cancelar</button>
+        </form>
+      </section>
+
+      <!-- Lista de sesiones -->
+      <section class="tarjeta">
+        <h2>Sesiones</h2>
+        <p id="listaVacia" class="lista__vacia">Todavía no hay sesiones. ¡Anímate a registrar la primera!</p>
+        <ul id="listaSesiones" class="lista"></ul>
+        <button type="button" id="botonMasSesiones" class="lista__mas" aria-expanded="false" hidden>Cargar más sesiones</button>
+      </section>
+    </div>
+
+  </div>
+
+  <!-- Goal celebration (Spec 004): hidden until a save crosses the goal. -->
+  <div class="felicitacion" id="felicitacion" hidden>
+    <div class="felicitacion__caja" role="dialog" aria-modal="true"
+         aria-labelledby="felicitacionTitulo" aria-describedby="felicitacionTexto">
+      <p class="felicitacion__emoji" aria-hidden="true">🎉</p>
+      <h2 id="felicitacionTitulo">¡Objetivo cumplido!</h2>
+      <p id="felicitacionTexto"></p>
+      <button type="button" id="botonCerrarFelicitacion">¡Gracias!</button>
+    </div>
+  </div>
+
+  <script src="logica.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
